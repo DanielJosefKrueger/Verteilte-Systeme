@@ -61,8 +61,8 @@ public class BankImpl extends UnicastRemoteObject implements Bank {
         return sum;
     }
 
-    public List<Integer> getAccountNoForName(String name) {
-        final List<Integer> accNos = new ArrayList<>();
+    public ArrayList<Integer> getAccountNoForName(String name) {
+        final ArrayList<Integer> accNos = new ArrayList<>();
         for (Account account : findAccounts(name)) {
             accNos.add(account.getAccNo());
         }
