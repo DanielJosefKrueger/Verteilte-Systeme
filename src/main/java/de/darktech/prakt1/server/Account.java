@@ -1,9 +1,9 @@
-package de.darktech.prakt1.main;
+package de.darktech.prakt1.server;
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
+import de.darktech.prakt1.interfaces.Balance;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 public class Account implements Serializable {
 
@@ -13,18 +13,21 @@ public class Account implements Serializable {
 
     private final String name;
     private String password;
-    private double money;
+    private final int accNo;
+    private double balance;
 
-    public Account(String name, String password, double money) {
+    public Account(String name, String password, double balance, int accNo) {
         this.name = name;
         this.password = password;
-        this.money = money;
+        this.balance = balance;
+        this.accNo = accNo;
     }
 
-    public Account(String name, String password) {
+    public Account(String name, String password, int accNo) {
         this.name = name;
         this.password = password;
-        this.money = START_BALANCE;
+        this.balance = START_BALANCE;
+        this.accNo = accNo;
     }
 
 
@@ -41,12 +44,12 @@ public class Account implements Serializable {
         this.password = password;
     }
 
-    public double getMoney() {
-        return money;
+    public double getBalance() {
+        return balance;
     }
 
-    public void setMoney(double money) {
-        this.money = money;
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
 
@@ -54,9 +57,7 @@ public class Account implements Serializable {
 
 
     public void deposit(String name, double ammount) throws WrongNameException, InvalidArgumentException {
-        if (name == null || !this.name.equals(name)) {
-            throw new WrongNameException();
-        }
+        testName(name);
         if (ammount <= 0) {
             throw new InvalidArgumentException(new String[]{"Ammount must be positive!"});
         }
@@ -64,7 +65,7 @@ public class Account implements Serializable {
     }
 
     private void changeMoney(double delta) {
-        this.money = money + delta;
+        this.balance = balance + delta;
     }
 
 
@@ -73,30 +74,49 @@ public class Account implements Serializable {
      * @return
      */
     public boolean testPasswordABitMoreSecurely(String input){
-        boolean correct =false;
+        boolean correct;
         long start = System.currentTimeMillis();
 
         correct = input.equals(password);
         Long mustWait = PASSWORD_CONTROL_TIME_MS - (System.currentTimeMillis()-start);
-        try {
-            TimeUnit.MILLISECONDS.wait(mustWait);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //   try {
+        //   TimeUnit.MILLISECONDS.wait(mustWait);
+        // } catch (InterruptedException e) {
+        //   e.printStackTrace();
+        // }
         return correct;
     }
 
 
     public void withDraw(String name, String pw, double amount) throws WrongNameException, InvalidArgumentException, WrongPasswordException {
+        testName(name);
+        if (amount <= 0) {
+            throw new InvalidArgumentException(new String[]{"Ammount must not  be negative!"});
+        }
+        testPassword(pw);
+        this.changeMoney(-amount);
+    }
+
+
+    public Balance getBelance(int number, String name, String password) throws WrongNameException, WrongPasswordException {
+        testName(name);
+        testPassword(password);
+        return new Balance(number, balance);
+    }
+
+    private void testPassword(String password) throws WrongPasswordException {
+        if (!testPasswordABitMoreSecurely(password)) {
+            throw new WrongPasswordException();
+        }
+    }
+
+    private void testName(String name) throws WrongNameException {
         if (name == null || !this.name.equals(name)) {
             throw new WrongNameException();
         }
-        if (amount >= 0) {
-            throw new InvalidArgumentException(new String[]{"Ammount must be negative!"});
-        }
-        if(!testPasswordABitMoreSecurely(pw)){
-            throw new WrongPasswordException();
-        }
-        this.changeMoney(amount);
+    }
+
+    public int getAccNo() {
+        return accNo;
     }
 }

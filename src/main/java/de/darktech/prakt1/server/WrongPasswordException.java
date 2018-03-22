@@ -1,4 +1,4 @@
-package de.darktech.prakt1.main;
+package de.darktech.prakt1.server;
 
 public class WrongPasswordException extends Exception {
 }
