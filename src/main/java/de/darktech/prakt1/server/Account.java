@@ -4,6 +4,7 @@ import com.sun.javaws.exceptions.InvalidArgumentException;
 import de.darktech.prakt1.interfaces.Balance;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 public class Account implements Serializable {
 
@@ -79,11 +80,11 @@ public class Account implements Serializable {
 
         correct = input.equals(password);
         Long mustWait = PASSWORD_CONTROL_TIME_MS - (System.currentTimeMillis()-start);
-        //   try {
-        //   TimeUnit.MILLISECONDS.wait(mustWait);
-        // } catch (InterruptedException e) {
-        //   e.printStackTrace();
-        // }
+           try {
+           TimeUnit.MILLISECONDS.wait(3);
+         } catch (InterruptedException e) {
+           e.printStackTrace();
+         }
         return correct;
     }
 
